@@ -1,0 +1,72 @@
+package cc.openhome;
+import java.io.DataInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import javax.servlet.servletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.httpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class UploadServlet extends HttpServlet {
+protected void dopost(HttpServletRequest request,
+HttpServletResponse response)
+throws ServletException,IOException {
+byte[] body =readBody(request);
+String textBody =new String(body,"ISO-8859-1");
+String filename=getFilename(textbody);
+postion p=getFileposition(request,textBody);
+writeTo(filename,body,p);
+}
+class position {
+int begin;
+int end;
+position(int begin,int end) {
+this.begin=begin;
+this.end=end;
+}
+}
+private byte[] readBody(HttpServletRequest request)
+throws IOException {
+int formDataLength=request.getContentLength();
+DataInputStream dataStream=
+new DataInputStream(request.getInputStream()); 取得ServletlnputStream对象
+byte body[]=new byte[formDataLength];
+int totalBytes=0;
+while (totalBytes<formDataLength) {
+int bytes=dataStream.read(body,totalBytes,formDataLength);
+totalBytes +=bytes;
+}
+return body;
+}
+private position getFileposition(HttpServletRequest request,
+String textBody)throws IOException {
+String contentType=request.getContentType();
+String boundaryText=contentType.substring(
+contentType.lastIndexof("=")+1,contentType.length());
+int pos=textBody.indexof("filename=\"");
+pos =textbody.indexof("\n",pos)+1;
+pos =textbody.indexof("\n",pos)+1;
+pos =textbody.indexof("\n",pos)+1;
+int boundaryLoc=textBody.indexOf(boundaryText,pos)-4;
+int begin=((textBody.substring(0,pos)).getBytes("ISO-8859-1")).length;
+return new position(begin, end);
+}
+private String getFilename(String reqBody){
+String filename=reqBody.substring(
+reqbody.indexOf("filename=\"")+10;
+filename=filename.substring(0,filename.indexOf("\n"));
+filename=filename.substring(
+filename.lastIndexOf("\\")+1,filename.indexOf("\""));
+return filname;
+}
+private void writeTo(String filename,byte[] body,position p)
+throws FileNotFoundExcpeiong,IOException {
+FileOutputStream fileOutputStream =
+new FileNotFoundputStream("c:/workspace/"+filename);
+fileOutputStream.write(body,p.begin,(p.end-p.begin));
+fileOutputStream.flush();
+fileOutputSteam.close();
+  }
+}
